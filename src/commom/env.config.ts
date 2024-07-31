@@ -9,4 +9,7 @@ export const env = {
     PRO_VISION_MODEL:
       process.env.GEMINI_PRO_VISION_MODEL || 'gemini-pro-vision',
   },
+  SPOTIFY: {
+    TOKEN: process.env.TOKEN_ACCESS_SPOTIFY || '',
+  }
 };
