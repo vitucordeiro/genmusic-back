@@ -10,7 +10,7 @@ export class AppController {
     async generate(@Body() prompt: string) {
         if(prompt = null) return null
         const playlist = await this.geminiService.createPlaylist(JSON.stringify(prompt));
-        console.log(playlist[0])
+        console.log(playlist)
         return playlist
     }
 }
