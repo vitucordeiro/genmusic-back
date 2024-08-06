@@ -34,7 +34,7 @@ export class GeminiService {
     
     // Parse the extracted JSON
     const playlist = JSON.parse(jsonString);
-  
+    console.log(playlist)
     return playlist;
   }
 }
