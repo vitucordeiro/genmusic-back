@@ -20,19 +20,23 @@ Backend application for GenMusic.
   ```
 
 ## Environment Variables
-  - GEMINI API KEY - Your Google Gemini API Key. -> https://ai.google.dev/gemini-api/docs
-  - TOKEN ACCESS SPOTIFY - Your Spotify API client ID. -> https://developer.spotify.com/documentation/web-api
-  - SPOTIFY.CLIENT_SECRET -> https://developer.spotify.com/documentation/web-api 
+
+  - GEMINI API KEY -> https://ai.google.dev/gemini-api/docs
+  - TOKEN ACCESS SPOTIFY -> https://developer.spotify.com/documentation/web-api
   - DATABASE URL -> Connection string from your cluster on MongoDB
+
 ## Services
+
   - GeminiService -> Handles communication with the Google Gemini API.
   - SpotifyService -> Handles communication with the Spotify API.
 
 ## Endpoints
+
   - POST /app/create - Creates a playlist based on a prompt.
 
 
 ## License
+
 MIT
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
