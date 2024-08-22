@@ -20,10 +20,10 @@ Backend application for GenMusic.
   ```
 
 ## Environment Variables
-  - GEMINI.KEY - Your Google Gemini API Key. -> https://ai.google.dev/gemini-api/docs
-  - SPOTIFY.CLIENT_ID - Your Spotify API client ID. -> https://developer.spotify.com/documentation/web-api
+  - GEMINI API KEY - Your Google Gemini API Key. -> https://ai.google.dev/gemini-api/docs
+  - TOKEN ACCESS SPOTIFY - Your Spotify API client ID. -> https://developer.spotify.com/documentation/web-api
   - SPOTIFY.CLIENT_SECRET -> https://developer.spotify.com/documentation/web-api 
-
+  - DATABASE URL -> Connection string from your cluster on MongoDB
 ## Services
   - GeminiService -> Handles communication with the Google Gemini API.
   - SpotifyService -> Handles communication with the Spotify API.
