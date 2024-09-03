@@ -11,5 +11,8 @@ export const env = {
   },
   SPOTIFY: {
     TOKEN: process.env.TOKEN_ACCESS_SPOTIFY || '',
+  },
+  DATABASE_URL: {
+    URL: process.env.DATABASE_URL || '',
   }
 };
