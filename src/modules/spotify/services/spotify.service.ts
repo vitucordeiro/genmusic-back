@@ -1,4 +1,5 @@
 import { Injectable, Logger, Headers } from '@nestjs/common';
+
 import axios from 'axios';
 @Injectable()
 export class SpotifyService {
@@ -7,48 +8,74 @@ export class SpotifyService {
     constructor(
     ) {
     }
-    getToken(token:string): string{
-      return `Bearer ${token}`;
-    }
-    async checkPlaylistOnSpotify(token:string, playlist: Record<string, string>) {
-      const results = [];
-
-      for (const [artist, song] of Object.entries(playlist)) {
-        try{
-
-          const searchResponse = await axios.get(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(`${artist} ${song}`)}&type=track&limit=1`,
-            {
-              headers: {
-                'Authorization': token
-              }
-            }
-          )
-          const track = searchResponse.data.tracks.items[0];
+    
+    async checkPlaylistOnSpotify(token: string, playlist: Record<string, string>) {
+      const searchPromises = Object.entries(playlist).map(([artist, song]) =>
+        axios.get(
+          `https://api.spotify.com/v1/search?q=${encodeURIComponent(`${artist} ${song}`)}&type=track&limit=1`,
+          { headers: { "Authorization": token } }
+        ).then(response => {
+          const track = response.data.tracks.items[0];
           if (track) {
-            results.push({
+            return {
               uri: track.uri,
               name: track.name,
               artist: track.artists[0].name,
               albumImage: track.album.images[0].url,
               previewUrl: track.preview_url
-            });
+            };
           }
-          
-          
-        } catch(error){
-          if (axios.isAxiosError(error)){
-            this.logger.error(`Error on request to API Spotify: ${error.message}`);
-              if (error.response){
-                this.logger.error(`Status: ${error.response.status}`);
-                this.logger.error(`Data: ${JSON.stringify(error.response.data)}`)
-              }
-          }else{
-            this.logger.error(`Unexpected error: ${error.message}`)
-          }
-          this.logger.error(`Artist and song doesn't exists`)
-        }
-      }
-      return results;
+          return null;
+        }).catch(error => {
+          this.logger.error(`Error searching for "${artist} - ${song}": ${error.message}`);
+          return null;
+        })
+      );
+    
+      const results = await Promise.all(searchPromises);
+      return results.filter(result => result !== null);
     }
+    
+   
+    async createPlaylistOnSpotify(token: string, uris: string[], playlistName: string) {
+      const PLAYLIST_DESCRIPTION = 'Playlist generate by GenMusic.ai'
+      try {
+        const userResponse = await axios.get('https://api.spotify.com/v1/me', {
+          headers: { "Authorization":token }
+        });
+        const userId = userResponse.data.id;
+    
+        const createPlaylistResponse = await axios.post(
+          `https://api.spotify.com/v1/users/${userId}/playlists`,
+          { 
+            name: playlistName, 
+            description: PLAYLIST_DESCRIPTION, 
+            public: false 
+          },
+          {
+            headers: { "Authorization": token }
+          }
+        );
+        const playlistId = createPlaylistResponse.data.id;
+        const playlistUrl = createPlaylistResponse.data.external_urls.spotify;
+        const playlistImage = createPlaylistResponse.data.images[0]?.url || null;
+        
+        await axios.post(
+          `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+          { uris: uris },
+          { headers: { "Authorization": token } }
+        );
+    
+        return [playlistUrl, playlistImage];
+
+      } catch (e) {
+        if (axios.isAxiosError(e)) {
+          console.error('Spotify API error:', e.response?.data);
+          throw new Error(`Spotify API error: ${e.response?.data?.error?.message || e.message}`);
+        }
+        console.error('Unexpected error:', e);
+        throw e;
+      }
+    }
+    
 }
