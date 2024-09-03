@@ -16,26 +16,41 @@ export class GeminiService {
   }
 
   public async createPlaylist(prompt: string): Promise<Record<string,string>> {
+
+    console.log("prompt:" + prompt)
     const model = await this.clientGoogleAI.getGenerativeModel({
       model: 'gemini-1.5-flash',
     });
     const result = await model.generateContent(
-      `Generate a playlist as a JSON object where the keys are song titles and the values are artist name. The prompt will be at the end of this content. You are a music curator and the best emotion-driven playlist creator in the world. Your specialty is delivering playlists with not so well-known and specific songs. Create a personalized playlist based on the following prompt: ${prompt}`,
+      `Generate a playlist as a JSON object where the keys are song titles and the values are artist name.
+       The prompt will be at the end of this content. You are the best music curator in the world. All genres is accept.
+        Create a personalized playlist based on the following prompt: ${prompt}`,
     );
     const rawText = result.response.text();
   
-    // Extract JSON using regex
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No valid JSON found in the response');
+    try {
+      // Attempt to parse the entire response as JSON
+      const playlist = JSON.parse(rawText);
+      this.logger.log('Playlist parsed successfully');
+      return playlist;
+    } catch (error) {
+      // If parsing fails, try to extract JSON using regex
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        this.logger.error('No valid JSON found in the response');
+        this.logger.error('Raw response:', rawText);
+        throw new Error('No valid JSON found in the response');
+      }
+      const jsonString = jsonMatch[0].trim();
+      try {
+        const playlist = JSON.parse(jsonString);
+        this.logger.log('Playlist extracted and parsed successfully');
+        return playlist;
+      } catch (parseError) {
+        this.logger.error('Failed to parse extracted JSON');
+        this.logger.error('Extracted JSON:', jsonString);
+        throw new Error('Failed to parse extracted JSON');
+      }
     }
-  
-    const jsonString = jsonMatch[0].trim();
-    
-    // Parse the extracted JSON
-    const playlist = JSON.parse(jsonString);
-    console.log(playlist)
-    return playlist;
   }
 }
-
