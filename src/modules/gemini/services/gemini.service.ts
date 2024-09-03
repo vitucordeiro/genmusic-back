@@ -17,7 +17,6 @@ export class GeminiService {
 
   public async createPlaylist(prompt: string): Promise<Record<string,string>> {
 
-    console.log("prompt:" + prompt)
     const model = await this.clientGoogleAI.getGenerativeModel({
       model: 'gemini-1.5-flash',
     });
@@ -29,12 +28,10 @@ export class GeminiService {
     const rawText = result.response.text();
   
     try {
-      // Attempt to parse the entire response as JSON
       const playlist = JSON.parse(rawText);
       this.logger.log('Playlist parsed successfully');
       return playlist;
     } catch (error) {
-      // If parsing fails, try to extract JSON using regex
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         this.logger.error('No valid JSON found in the response');
