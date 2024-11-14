@@ -24,7 +24,6 @@ export class AppController {
 
     @Post('/generate')
     async generate(@Body('uris') uris:string[], @Body('playlistName') playlist:string, @Headers() headers) {
-        console.log(playlist)
         try{
             const rawToken = headers['authorization'];
             const response = await this.spotifyService.createPlaylistOnSpotify(rawToken, uris, playlist);
