@@ -28,7 +28,6 @@ export class AppController {
         try{
             const rawToken = headers['authorization'];
             const response = await this.spotifyService.createPlaylistOnSpotify(rawToken, uris, playlist);
-            console.log("foi")
             return JSON.parse(JSON.stringify(response));
         } catch(e){
             console.error(e)
